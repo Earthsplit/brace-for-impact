@@ -1,9 +1,26 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+  from engine import Engine
+  from entity import Entity
 class Action:
-  pass
+  """Perform this action with the objects needed to determine its scope.
+
+  `engine` is the scope this action is being performed in.
+
+  `entity` is the object performing the action.
+
+  This method must be overridden by Action subclasses.
+  """
+  def perform(self, engine: Engine, entity: Entity):
+    raise NotImplementedError()
 
 # subclasses of Action
 class EscapeAction(Action):
-  pass
+  def perform(self, engine: Engine, entity: Entity) -> None:
+    raise SystemExit()
 
 class MovementAction(Action):
   def __init__(self, dx, dy):
@@ -11,3 +28,31 @@ class MovementAction(Action):
 
     self.dx = dx
     self.dy = dy
+
+  def perform(self, engine: Engine, entity: Entity):
+    dest_x = entity.x + self.dx
+    dest_y = entity.y + self.dy
+
+    if not engine.game_map.in_bounds(dest_x, dest_y):
+      return
+    if not engine.game_map.tiles["walkable"][dest_x, dest_y]:
+      return
+    
+    entity.move(self.dx, self.dy)
+class MovementAction(Action):
+  def __init__(self, dx, dy):
+    super().__init__() # calling the constructor of the Action class
+
+    self.dx = dx
+    self.dy = dy
+
+  def perform(self, engine: Engine, entity: Entity):
+    dest_x = entity.x + self.dx
+    dest_y = entity.y + self.dy
+
+    if not engine.game_map.in_bounds(dest_x, dest_y):
+      return
+    if not engine.game_map.tiles["walkable"][dest_x, dest_y]:
+      return
+    
+    entity.move(self.dx, self.dy)

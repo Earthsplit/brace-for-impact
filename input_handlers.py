@@ -6,7 +6,7 @@ class EventHandler(tcod.event.EventDispatch[Action]):
   def ev_quit(self, event):
     raise SystemExit()
   
-  def ev_keydown(self, event: tcod.event.KeyDown):
+  def ev_keydown(self, event):
     action = None
 
     key = event.sym
