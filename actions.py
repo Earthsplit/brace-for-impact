@@ -6,7 +6,7 @@ class EscapeAction(Action):
   pass
 
 class MovementAction(Action):
-  def __init__(self, dx: int, dy: int):
+  def __init__(self, dx, dy):
     super().__init__() # calling the constructor of the Action class
 
     self.dx = dx
