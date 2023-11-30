@@ -27,7 +27,7 @@ class RectangularRoom:
   
   @property
   def inner(self) -> Tuple[slice, slice]:
-    """Return the inner area of this room as a 2D array index."""
+    # Return the inner area of this room as a 2D array index.
     return slice(self.x1 + 1, self.x2), slice(self.y1 + 1, self.y2)
   
   def intersects(self, other: RectangularRoom) -> bool:
