@@ -21,31 +21,38 @@ class Action:
 class EscapeAction(Action):
   def perform(self, engine: Engine, entity: Entity) -> None:
     raise SystemExit()
-
-class MovementAction(Action):
-  def __init__(self, dx, dy):
-    super().__init__() # calling the constructor of the Action class
-
+  
+class ActionWithDirection(Action):
+  def __init__(self, dx: int, dy: int):
+    super().__init__()
+    
     self.dx = dx
     self.dy = dy
-
+    
+    def perform(self, engine: Engine, entity: Entity):
+      raise NotImplementedError()
+    
+class MeleeAction(ActionWithDirection):
   def perform(self, engine: Engine, entity: Entity):
     dest_x = entity.x + self.dx
     dest_y = entity.y + self.dy
-
-    if not engine.game_map.in_bounds(dest_x, dest_y):
-      return
-    if not engine.game_map.tiles["walkable"][dest_x, dest_y]:
+    target = engine.game_map.get_blocking_entity_at_location(dest_x, dest_y)
+    if not target:
       return
     
-    entity.move(self.dx, self.dy)
-class MovementAction(Action):
-  def __init__(self, dx, dy):
-    super().__init__() # calling the constructor of the Action class
+    print(f'You kick the {target.name}, much to its annoyance!')
+    
+class BumpAction(ActionWithDirection):
+  def perform(self, engine: Engine, entity: Entity):
+    dest_x = entity.x + self.dx
+    dest_y = entity.y + self.dy
+    
+    if engine.game_map.get_blocking_entity_at_location(dest_x, dest_y):
+      return MeleeAction(self.dx, self.dy).perform(engine, entity)
+    else:
+      return MovementAction(self.dx, self.dy).perform(engine, entity)
 
-    self.dx = dx
-    self.dy = dy
-
+class MovementAction(ActionWithDirection):
   def perform(self, engine: Engine, entity: Entity):
     dest_x = entity.x + self.dx
     dest_y = entity.y + self.dy
@@ -54,5 +61,7 @@ class MovementAction(Action):
       return
     if not engine.game_map.tiles["walkable"][dest_x, dest_y]:
       return
+    if engine.game_map.get_blocking_entity_at_location(dest_x, dest_y):
+      return # Destination is blocked by an entity.
     
     entity.move(self.dx, self.dy)
