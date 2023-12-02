@@ -1,8 +1,6 @@
 import tcod
 import copy
-from random import randint
 
-from input_handlers import EventHandler
 import entity_factories
 from engine import Engine
 from procgen import generate_dungeon
@@ -24,28 +22,27 @@ def main():
     "data/Alloy_curses_12x12.png", columns=16, rows=16, charmap=tcod.tileset.CHARMAP_CP437
   )
 
-  event_handler = EventHandler()
-
   player = copy.deepcopy(entity_factories.player)
+  engine = Engine(player)
 
-  game_map = generate_dungeon(
+  engine.game_map = generate_dungeon(
     max_rooms,
     room_min_size,
     room_max_size,
     map_width,
     map_height,
     max_monsters_per_room,
-    player
+    engine
   )
-
-  engine = Engine(event_handler=event_handler, game_map=game_map, player=player)
+  
+  engine.update_fov()
 
   with tcod.context.new_terminal(screen_width, screen_height, tileset=tileset, title="brace for impact") as context:
     root_console = tcod.console.Console(screen_width, screen_height, order="F")
     while True:  # Main loop
       engine.render(console=root_console, context=context)
 
-      engine.handle_events(tcod.event.wait())
+      engine.event_handler.handle_events()
 
 if __name__ == "__main__":
   main()
