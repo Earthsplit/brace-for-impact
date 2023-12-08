@@ -1,5 +1,6 @@
 import tcod
 import copy
+import traceback
 
 import entity_factories
 import color
@@ -18,6 +19,7 @@ def main():
   max_rooms = 30 
   
   max_monsters_per_room = 2
+  max_items_per_room = 2
 
   tileset = tcod.tileset.load_tilesheet(
     "data/Alloy_curses_12x12.png", columns=16, rows=16, charmap=tcod.tileset.CHARMAP_CP437
@@ -33,6 +35,7 @@ def main():
     map_width,
     map_height,
     max_monsters_per_room,
+    max_items_per_room, 
     engine
   )
   
@@ -46,7 +49,15 @@ def main():
       root_console.clear()
       engine.event_handler.on_render(console=root_console)
       context.present(root_console)
-      engine.event_handler.handle_events(context)
+      
+      try:
+        for event in tcod.event.wait():
+          context.convert_event(event)
+          engine.event_handler.handle_events(event)
+      except Exception: # handle exceptions in game
+        traceback.print_exc() # print error to stderr
+        # then print the error to the message log
+        engine.message_log.add_message(traceback.format_exc(), color.error)
 
 if __name__ == "__main__":
   main()

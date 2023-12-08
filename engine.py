@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 from tcod.console import Console
 from tcod.map import compute_fov
 
+import exceptions
 from input_handlers import MainGameEventHandler
 from message_log import MessageLog
 from render_functions import render_bar, render_names_at_mouse_location
@@ -25,7 +26,10 @@ class Engine:
   def handle_enemy_turns(self):
     for entity in set(self.game_map.actors) - {self.player}:
       if entity.ai:
-        entity.ai.perform()
+        try:
+          entity.ai.perform()
+        except exceptions.Impossible:
+          pass # Ignore impossible action exceptions from AI.
 
   def update_fov(self):
     # Recompute the visible area based on the players point of view.
