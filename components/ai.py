@@ -5,13 +5,12 @@ from typing import List, Tuple, TYPE_CHECKING
 import numpy as np  # type: ignore
 import tcod
 
-from components.base_component import BaseComponent
 from actions import Action, MeleeAction, MovementAction, WaitAction
 
 if TYPE_CHECKING:
   from entity import Actor
 
-class BaseAI(Action, BaseComponent):
+class BaseAI(Action):
   entity: Actor
   
   def perform(self):
